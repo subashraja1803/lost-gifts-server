@@ -11,7 +11,12 @@ const checkUsernameSchema = Joi.object({
   username: Joi.string().max(30).required(),
 });
 
+const checkOTP = Joi.object({
+  otp: Joi.string().min(6).max(6).required(),
+});
+
 module.exports = {
   registerSchema,
   checkUsernameSchema,
+  checkOTP,
 };
