@@ -15,8 +15,15 @@ const checkOTP = Joi.object({
   otp: Joi.string().min(6).max(6).required(),
 });
 
+const loginSchema = Joi.object({
+  username: Joi.string().alphanum().max(30),
+  email: Joi.string().email({ minDomainSegments: 2 }),
+  password: Joi.string().required(),
+});
+
 module.exports = {
   registerSchema,
   checkUsernameSchema,
   checkOTP,
+  loginSchema,
 };
