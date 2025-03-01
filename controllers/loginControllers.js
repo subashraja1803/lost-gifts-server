@@ -1,8 +1,10 @@
+/* eslint-disable no-undef */
 const DB_NAMES = require("../constants/dbNames");
 const { createConnectionRef } = require("../plugins/dbConnection/firebase");
 const { where, query } = require("firebase/firestore");
 const bcrypt = require("bcryptjs");
 const { getDatafromQuery, decryptPassword } = require("../utils/CommonUtils");
+const jwt = require("jsonwebtoken");
 
 const loginUser = (req, res) => {
   const { username, email, password } = req.body;
@@ -18,7 +20,6 @@ const loginUser = (req, res) => {
     : query(usersRef, where("username", "==", username));
   getDatafromQuery(userQuery)
     .then((results) => {
-      console.log(password, results);
       const decryptedPW = decryptPassword(password);
       if (results.length > 0) {
         const usersData = results[0];
@@ -30,25 +31,33 @@ const loginUser = (req, res) => {
 
           if (result) {
             console.log("Passwords match! User authenticated");
-            res.send({
+            const userToken = jwt.sign(
+              { username: usersData.username },
+              process.env.JWT_PVT_KEY,
+              { expiresIn: "8h" }
+            );
+            res.status(200).send({
               status: "ok",
-              reponseCode: 2,
-              message: "User Login successful",
+              responseCode: 1,
+              message: "User Authentication Successful",
+              data: {
+                token: userToken,
+              },
             });
           } else {
             console.error("Passwords do not match! Authentication failed");
-            res.status(500).send({
+            res.status(200).send({
               status: "not ok",
               reponseCode: 2,
-              message: "User Authentication failed",
+              message: "User Authentication failed, Invalid Password",
             });
           }
         });
       } else {
-        res.status(500).send({
+        res.status(200).send({
           status: "not ok",
-          reponseCode: 2,
-          message: "User doesnt exist",
+          reponseCode: 3,
+          message: "User doesnt exist, Invalid Username",
         });
       }
     })

@@ -31,7 +31,6 @@ const getDatafromQuery = (query) => {
 
 const decryptPassword = (data) => {
   const [encryptedText, iv] = data.split("_");
-  console.log({ encryptedText, iv });
   const decryptedData = cryptoJS.AES.decrypt(
     encryptedText,
     process.env.CRYPTO_KEY,
@@ -39,7 +38,6 @@ const decryptPassword = (data) => {
       iv: iv,
     }
   ).toString(cryptoJS.enc.Utf8);
-  console.log("decryptedData", decryptedData);
   return decryptedData;
 };
 
